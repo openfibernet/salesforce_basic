@@ -11,6 +11,12 @@ import boto3
 
 logger = logging.getLogger(__name__)
 
+
+class SFError(Exception):
+    def __init__(self, text):
+        self.text = text
+        
+
 class SalesforceBasicConnector:
     def __init__(self, testing = False, **kwargs):
         if 'client_id' not in kwargs:
@@ -35,7 +41,11 @@ class SalesforceBasicConnector:
             locator = locator[1:]
         if refresh:
             refresh_path = "https://%s/services/oauth2/token?grant_type=refresh_token&client_id=%s&client_secret=%s&refresh_token=%s" % (self.refresh_host, self.client_id, self.client_secret, self.refresh_token)
-            response = urlopen(refresh_path)
+            try:
+                response = urlopen(refresh_path)
+            except:
+                logger.exception('could not get new refresh token from %s' % refresh_path)
+                raise
             self.access_token = json.loads(response.read())['access_token']
             logger.info('did a refresh, got a new access token')
         request_string = self.request_prefix + locator
