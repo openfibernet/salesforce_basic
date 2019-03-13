@@ -2,7 +2,7 @@ from setuptools import setup
  
 setup(
      name='salesforce_basic',    # This is the name of your PyPI-package.
-     version='0.3',                          # Update the version number for new releases
+     version='0.4',                          # Update the version number for new releases
      author='Dan Aronson',
      author_email='dan@openfiber.net',
      description='Basic class for talking to salesforce, refreshes the access token if needed',

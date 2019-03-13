@@ -11,6 +11,12 @@ import boto3
 
 logger = logging.getLogger(__name__)
 
+class SFError(Exception):
+    def __init__(self, text):
+        self.text = text
+        
+
+
 class SalesforceBasicConnector:
     def __init__(self, sandbox = False, **kwargs):
         if 'client_id' not in kwargs:
