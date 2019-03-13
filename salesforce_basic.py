@@ -11,14 +11,20 @@ import boto3
 
 logger = logging.getLogger(__name__)
 
+class SFError(Exception):
+    def __init__(self, text):
+        self.text = text
+        
+
+
 class SalesforceBasicConnector:
-    def __init__(self, testing = False, **kwargs):
+    def __init__(self, sandbox = False, **kwargs):
         if 'client_id' not in kwargs:
             # this means that we get them from the aws parameter store
             aws_client = boto3.client('ssm', region_name = kwargs['region_name'])
             logging.info('getting client info from aws')
             kwargs = json.loads(aws_client.get_parameter(Name=kwargs['name'])['Parameter']['Value'])
-        if testing:
+        if sandbox:
             self.refresh_host = 'test.salesforce.com'
         else:
             self.refresh_host = 'login.salesforce.com'
