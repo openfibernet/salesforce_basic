@@ -6,6 +6,7 @@ import os
 from time import sleep
 import json
 import boto3
+import pdb
 
 
 
@@ -36,7 +37,7 @@ class SalesforceBasicConnector:
         self.request_prefix = self.request_url + '/services/data/v44.0/'
         return
 
-    def do_request(self, locator, refresh = False, data=None, patch = False):
+    def do_request(self, locator, refresh = False, data=None, patch = False, return_as_json = True):
         if '/' == locator[0]:
             locator = locator[1:]
         if refresh:
@@ -58,7 +59,9 @@ class SalesforceBasicConnector:
                 if patch:
                     return
                 else:
-                    return json.loads(data)
+                    if return_as_json:
+                        data = json.loads(data)
+                    return data
             else:
                 raise Exception("Expecting OK status, got %d (error: %s) from requesting: '%s'" % (code, data, request_string))
         except HTTPError as err:
@@ -70,7 +73,7 @@ class SalesforceBasicConnector:
                 raise SFError(text)
             else:
                 logger.info('redoing request with refresh')
-                return self.do_request(locator, refresh = True, data = data)
+                return self.do_request(locator, refresh = True, data = data, return_as_json = return_as_json)
         return 
 
 
