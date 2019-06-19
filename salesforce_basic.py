@@ -56,8 +56,8 @@ class SalesforceBasicConnector:
             code = response.getcode()
             data = response.read()
             if (200 <= code) and (299 >= code):
-                if patch:
-                    return
+                if 'POST' != method:
+                    return data
                 else:
                     if return_as_json:
                         data = json.loads(data)
@@ -73,7 +73,7 @@ class SalesforceBasicConnector:
                 raise SFError(text)
             else:
                 logger.info('redoing request with refresh')
-                return self.do_request(locator, refresh = True, data = data, return_as_json = return_as_json)
+                return self.do_request(locator, refresh = True, data = data, return_as_json = return_as_json, method = method)
         return 
 
 
