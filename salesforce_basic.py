@@ -37,7 +37,7 @@ class SalesforceBasicConnector:
         self.request_prefix = self.request_url + '/services/data/v44.0/'
         return
 
-    def do_request(self, locator, refresh = False, data=None, patch = False, return_as_json = True):
+    def do_request(self, locator, refresh = False, data=None, method = 'POST', return_as_json = True, delete = False):
         if '/' == locator[0]:
             locator = locator[1:]
         if refresh:
@@ -48,8 +48,8 @@ class SalesforceBasicConnector:
         request_string = self.request_prefix + locator
         logger.info('at=%s' % self.access_token)
         request = Request(request_string, headers = {'Authorization' : 'Bearer ' + self.access_token, 'content-type': 'application/json'})
-        if patch:
-            request.get_method = lambda: 'PATCH'
+        if 'POST' != method:
+            request.get_method = lambda: method
         logger.info('making request to %s with data %s' % (request_string, data))
         try:
             response = urlopen(request, data= data)
