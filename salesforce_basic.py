@@ -56,12 +56,9 @@ class SalesforceBasicConnector:
             code = response.getcode()
             data = response.read()
             if (200 <= code) and (299 >= code):
-                if 'POST' != method:
-                    return data
-                else:
-                    if return_as_json:
-                        data = json.loads(data)
-                    return data
+                if return_as_json:
+                    data = json.loads(data)
+                return data
             else:
                 raise Exception("Expecting OK status, got %d (error: %s) from requesting: '%s'" % (code, data, request_string))
         except HTTPError as err:
