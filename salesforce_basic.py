@@ -66,15 +66,32 @@ class SalesforceBasicConnector:
                 raise Exception("Expecting OK status, got %d (error: %s) from requesting: '%s'" % (code, data, request_string))
         except HTTPError as err:
             text = err.read()
-            logger.warning('got http err, code is: %d, reason: %s' % (err.code, text))
             # raise if not 401 or 401 and refresh
             if refresh or (401 != err.code):
+                logger.warning('got http err, code is: %d, reason: %s' % (err.code, text))
                 logger.warning('raising error')
                 raise SFError(text)
             else:
-                logger.info('redoing request with refresh')
+                logger.info('bad authorization, redoing request with refresh')
                 return self.do_request(locator, refresh = True, data = data, return_as_json = return_as_json, method = method)
         return 
+    
+    def get_all_objects_of_type(self, fields, object_type):
+        logger.info('querying fields %s of %s' % (fields, object_type))
+        query_results = self.do_request("query/?q=%s" % quote("select %s From %s" % (','.join(fields), object_type)))
+        while True:
+            logger.info('Total %d, count %d objects, done:%s' % (query_results['totalSize'], len(query_results['records']), query_results['done']))
+            for record in query_results['records']:
+                yield record
+            next_record_url = query_results.get('nextRecordsUrl', None)
+            if next_record_url:
+                next_record_url = next_record_url[next_record_url.index('query'):]
+                query_results = self.do_request(next_record_url)
+            else:
+                break
+        logger.info('finished finding objects')
+        return
+
 
 
 
