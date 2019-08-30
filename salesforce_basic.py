@@ -50,7 +50,10 @@ class SalesforceBasicConnector:
         request = Request(request_string, headers = {'Authorization' : 'Bearer ' + self.access_token, 'content-type': 'application/json'})
         if 'POST' != method:
             request.get_method = lambda: method
-        logger.info('making request to %s with data %s' % (request_string, data))
+        display_data = data
+        if display_data and (200 < len(display_data)):
+            display_data = display_data[:200] + b"..."
+        logger.info('making request to %s with data %s' % (request_string, display_data))
         try:
             response = urlopen(request, data= data)
             code = response.getcode()
