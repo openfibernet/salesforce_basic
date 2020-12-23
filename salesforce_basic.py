@@ -61,6 +61,8 @@ class SalesforceBasicConnector:
             if (200 <= code) and (299 >= code):
                 if return_as_json:
                     data = json.loads(data)
+                logger.debug("Returning data:")
+                logger.debug(data)
                 return data
             else:
                 raise Exception("Expecting OK status, got %d (error: %s) from requesting: '%s'" % (code, data, request_string))
